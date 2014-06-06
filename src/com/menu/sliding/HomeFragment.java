@@ -146,8 +146,8 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	        songTotalDurationLabel = (TextView) rootView.findViewById(R.id.songTotalDurationLabel);
 	        
 	     // Mediaplayer
-	        mp = new MediaPlayer();
-	       //mp = GlobalLists.getMP();
+	        //mp = new MediaPlayer();
+	       mp = GlobalLists.getMP();
 	        // songManager = new SongsManager();
 	        utils = new Utilities();
 	        

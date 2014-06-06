@@ -2,8 +2,8 @@ package com.menu.sliding;
 
 import com.menu.sliding.R;
 
-
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +27,11 @@ public class IntensityFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				GlobalLists.setMode(1);
+				Fragment f = new HomeFragment();
+				FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				transaction.replace(R.id.frame_container, f);
+				transaction.addToBackStack(null);
+				transaction.commit();
 			}
 		});
 		
@@ -35,6 +40,11 @@ public class IntensityFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				GlobalLists.setMode(2);
+				Fragment f = new HomeFragment();
+				FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				transaction.replace(R.id.frame_container, f);
+				transaction.addToBackStack(null);
+				transaction.commit();
 			}
 		});
 		
@@ -43,6 +53,11 @@ public class IntensityFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				GlobalLists.setMode(3);
+				Fragment f = new HomeFragment();
+				FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				transaction.replace(R.id.frame_container, f);
+				transaction.addToBackStack(null);
+				transaction.commit();
 			}
 		});  
         return rootView;

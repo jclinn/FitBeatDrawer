@@ -11,6 +11,7 @@ public class GlobalLists {
 	private static int comboMode = 0;
 	private static int first = 0;
 	private static int listFlag = 0;
+	private static int index = 0;
 	
 	private static  MediaPlayer mp = new MediaPlayer();
 	private static HashMap<String, String> masterList = new HashMap<String, String>();
@@ -154,7 +155,7 @@ public class GlobalLists {
     	return songsListMed;
     }
     public static void setMed( ArrayList<HashMap<String, String>> cur) {
-    	songsListHard= cur;
+    	songsListMed= cur;
     }
     public static ArrayList<HashMap<String, String>> getEasy() {
     	return songsListEasy;
@@ -177,5 +178,6 @@ public class GlobalLists {
     }
     public static void setMP(MediaPlayer m) { mp = m;}
     public static MediaPlayer getMP() { return mp;}
-    
+    public static void setIndex(int i) { index = i; }
+    public static int getIndex(){ return index;} 
 }

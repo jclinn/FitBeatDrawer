@@ -35,6 +35,7 @@ public class ModeFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				GlobalLists.setWorkout(1);
+				//GlobalLists.setlistFlag(0);
 				Fragment f = new HomeFragment();
 				FragmentTransaction transaction = getFragmentManager().beginTransaction();
 				transaction.replace(R.id.frame_container, f);
@@ -53,7 +54,11 @@ public class ModeFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				GlobalLists.setWorkout(2);
-				
+				Fragment f = new HomeFragment();
+				FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				transaction.replace(R.id.frame_container, f);
+				transaction.addToBackStack(null);
+				transaction.commit();
 				//System.out.println (" popped: " + getFragmentManager().popBackStackImmediate());
 				/*Intent intent = new Intent(SelectModeActivity.this, com.hci.fitbeat.WorkoutActivity.class);
 				intent.putExtra("workout", 2);
@@ -66,7 +71,11 @@ public class ModeFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				GlobalLists.setWorkout(3);
-				
+				Fragment f = new HomeFragment();
+				FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				transaction.replace(R.id.frame_container, f);
+				transaction.addToBackStack(null);
+				transaction.commit();
 				/*Intent intent = new Intent(SelectModeActivity.this, com.hci.fitbeat.WorkoutActivity.class);
 				intent.putExtra("workout", 3);
 				startActivity(intent);*/

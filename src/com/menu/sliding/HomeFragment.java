@@ -170,10 +170,10 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 				e.printStackTrace();
 			}
 	        
-	        getFragmentManager().beginTransaction()
+	        /*getFragmentManager().beginTransaction()
             // Add this transaction to the back stack
             .addToBackStack("found")
-            .commit();
+            .commit();*/
 	        
 	      //update playlists
 			comboMode = checkModeIntensity(GlobalLists.getMode(), GlobalLists.getWorkout());
@@ -275,13 +275,16 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 		            @Override
 		            public void onClick(View arg0) {
 		                // check if next song is there or not
-		                if(currentSongIndex < (songsListCur.size() - 1)){
-		                    playSong(currentSongIndex + 1, mode);
-		                    currentSongIndex = currentSongIndex + 1;
+		                if(GlobalLists.getIndex() < (songsListCur.size() - 1)){
+		                    playSong(GlobalLists.getIndex() + 1, mode);
+		                    
+		                   // currentSongIndex = currentSongIndex + 1;
+		                    GlobalLists.setIndex(GlobalLists.getIndex() +1);
 		                }else{
 		                    // play first song
 		                    playSong(0, mode);
-		                    currentSongIndex = 0;
+		                    //currentSongIndex = 0;
+		                    GlobalLists.setIndex(0);
 		                }
 		 
 		            }
@@ -295,13 +298,14 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 		 
 		            @Override
 		            public void onClick(View arg0) {
-		                if(currentSongIndex > 0){
-		                    playSong(currentSongIndex - 1, mode);
-		                    currentSongIndex = currentSongIndex - 1;
+		                if(GlobalLists.getIndex() > 0){
+		                    playSong(GlobalLists.getIndex() - 1, mode);
+		                    GlobalLists.setIndex(GlobalLists.getIndex() -1);// = currentSongIndex - 1;
 		                }else{
 		                    // play last song
 		                    playSong(songsListCur.size() - 1, mode);
-		                    currentSongIndex = songsListCur.size() - 1;
+		                    //currentSongIndex = songsListCur.size() - 1;
+		                    GlobalLists.setIndex(songsListCur.size() - 1);
 		                }
 		 
 		            }
@@ -509,21 +513,24 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	        // check for repeat is ON or OFF
 	        if(isRepeat){
 	            // repeat is on play same song again
-	            playSong(currentSongIndex, mode);
+	            playSong(GlobalLists.getIndex(), mode);
 	        } else if(isShuffle){
 	            // shuffle is on - play a random song
 	            Random rand = new Random();
-	            currentSongIndex = rand.nextInt((songsListCur.size() - 1) - 0 + 1) + 0;
-	            playSong(currentSongIndex, mode);
+	            //currentSongIndex = rand.nextInt((songsListCur.size() - 1) - 0 + 1) + 0;
+	            GlobalLists.setIndex(rand.nextInt((songsListCur.size() - 1) - 0 + 1) + 0);
+	            playSong(GlobalLists.getIndex(), mode);
 	        } else{
 	            // no repeat or shuffle ON - play next song
-	            if(currentSongIndex < (songsListCur.size() - 1)){
-	                playSong(currentSongIndex + 1, mode);
-	                currentSongIndex = currentSongIndex + 1;
+	            if(GlobalLists.getIndex() < (songsListCur.size() - 1)){
+	                playSong(GlobalLists.getIndex() + 1, mode);
+	                //currentSongIndex = currentSongIndex + 1;
+	                GlobalLists.setIndex(GlobalLists.getIndex() + 1);
 	            }else{
 	                // play first song
 	                playSong(0, mode);
-	                currentSongIndex = 0;
+	                //currentSongIndex = 0;
+	                GlobalLists.setIndex(0);
 	            }
 	        }
 	    }
@@ -541,8 +548,8 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 					e.printStackTrace();
 				}
 			}
-			System.out.println(" size auto interval " + GlobalLists.getEasy1().size() + 
-					GlobalLists.getMed1().size() + GlobalLists.getHard1().size());
+			System.out.println(" size auto interval " + GlobalLists.getEasy1().size() + " easy: " + GlobalLists.getEasy().size() + " " + 
+					GlobalLists.getMed1().size() +  " med: " + GlobalLists.getMed().size() +  " hard: " + GlobalLists.getHard().size() + " " + GlobalLists.getHard1().size());
 			
 			if( GlobalLists.getlistFlag() == 0) {
 				GlobalLists.setEasy(songsListEasy);
@@ -559,6 +566,8 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 					GlobalLists.getMed1().size() + GlobalLists.getHard1().size());
 			
 			}
+			System.out.println(" sizes interval " + GlobalLists.getEasy1().size() + " easy: " + GlobalLists.getEasy().size() + " " + 
+					GlobalLists.getMed1().size() +  " med: " + GlobalLists.getMed().size() +  " hard: " + GlobalLists.getHard().size() + " " + GlobalLists.getHard1().size());
 			GlobalLists.setlistFlag(1);
 			GlobalLists.setEasyInterval(updateIntervalList(GlobalLists.getEasy1(), GlobalLists.getMed1()));
 			GlobalLists.setMedInterval(updateIntervalList(GlobalLists.getEasy2(),  GlobalLists.getMed2()));
@@ -644,10 +653,12 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 														song.put("mode", med1);
 														songsListMed1.add(song);
 														songsListMed.add(song);
+														System.out.println("med song added");
 													} else if(mode.equals(med2)) {
 														song.put("mode", med2);
 														songsListMed2.add(song);
 														songsListMed.add(song);
+														System.out.println("med song added");
 													} else if(mode.equals(hard1)) {
 													    song.put("mode", hard1);
 													    songsListHard1.add(song);
@@ -777,13 +788,13 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 			if(workout == 1) {
 				if( mode == 1 ) { //easy
 					comboMode = 1;
-					songsListCur = songsListEasy;
+					songsListCur = GlobalLists.getEasy();//songsListEasy;
 				} else if (mode == 2) { //medium
 					comboMode = 2;
-					songsListCur = songsListMed;
+					songsListCur = GlobalLists.getMed();//songsListMed;
 				} else { //hard
 					comboMode = 3;
-					songsListCur = songsListHard;
+					songsListCur = GlobalLists.getHard();//songsListHard;
 				}
 			} else if (workout == 2) { //interval
 				if( mode == 1 ) { //easy

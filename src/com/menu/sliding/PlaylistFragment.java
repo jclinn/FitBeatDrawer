@@ -60,7 +60,7 @@ public class PlaylistFragment extends ListFragment{
 		//ListView lv = (ListView) rootView.findViewById(R.id.list);
 		// selecting single ListView item
 		ListView lv = getListView();
-		/*lv.setOnItemClickListener(new OnItemClickListener() {
+		lv.setOnItemClickListener(new OnItemClickListener() {
 			 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -68,16 +68,11 @@ public class PlaylistFragment extends ListFragment{
 				// getting listitem index
 				int songIndex = position;
 				
-				//starting new intent
-				Intent in = new Intent(getActivity().getApplicationContext(), HomeFragment.class);
-				//sending songIndex to PlayerActivity
-				in.putExtra("songIndex", songIndex);
-				setResult(100, in);
-				//Closing PlayListView
-				finish();
+				GlobalLists.setIndex(songIndex);
+				
 			}
 		
-		});*/
+		});
        // return rootView;
     }
 }

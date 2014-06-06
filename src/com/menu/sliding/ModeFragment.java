@@ -26,16 +26,21 @@ public class ModeFragment extends Fragment {
             Bundle savedInstanceState) {
   
         View rootView = inflater.inflate(R.layout.fragment_mode, container, false);
-        getFragmentManager().beginTransaction()
+     /*   getFragmentManager().beginTransaction()
         // Add this transaction to the back stack
         .addToBackStack("found")
-        .commit();
+        .commit();*/
         auto = (Button) rootView.findViewById(R.id.auto);
 		auto.setOnClickListener(new View.OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				GlobalLists.setWorkout(1);
-				System.out.println (" popped: " + getActivity().getFragmentManager().popBackStackImmediate());
+				Fragment f = new HomeFragment();
+				FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				transaction.replace(R.id.frame_container, f);
+				transaction.addToBackStack(null);
+				transaction.commit();
+				//System.out.println (" popped: " + getActivity().getFragmentManager().popBackStackImmediate());
 				/*Intent intent = new Intent(SelectModeActivity.this, com.hci.fitbeat.WorkoutActivity.class);
 				intent.putExtra("workout", 1);
 				startActivity(intent);*/
@@ -49,7 +54,7 @@ public class ModeFragment extends Fragment {
 			public void onClick(View v) {
 				GlobalLists.setWorkout(2);
 				
-				System.out.println (" popped: " + getFragmentManager().popBackStackImmediate());
+				//System.out.println (" popped: " + getFragmentManager().popBackStackImmediate());
 				/*Intent intent = new Intent(SelectModeActivity.this, com.hci.fitbeat.WorkoutActivity.class);
 				intent.putExtra("workout", 2);
 				startActivity(intent);*/

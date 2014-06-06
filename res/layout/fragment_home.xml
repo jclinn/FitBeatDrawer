@@ -24,7 +24,7 @@
  	   
       
     <!-- Player Header -->
-    <LinearLayout
+   <LinearLayout
         android:id="@+id/player_header_bg"
         android:layout_width="fill_parent"
         android:layout_height="140dip"
@@ -52,13 +52,7 @@
             android:fontFamily="Arial"
             android:layout_marginTop="10dp"/>
  
-        <!-- Playlist button -->
-        <ImageButton
-            android:id="@+id/btnPlaylist"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:src="@drawable/btn_playlist"
-            android:background="@null"/>
+       
     </LinearLayout>
  
     <!-- Song Thumbnail Image -->

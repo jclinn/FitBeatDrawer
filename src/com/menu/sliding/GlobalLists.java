@@ -3,13 +3,16 @@ package com.menu.sliding;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.media.MediaPlayer;
+
 public class GlobalLists {
 	private static int mode = 0;
 	private static int workout =1;
 	private static int comboMode = 0;
 	private static int first = 0;
+	private static int listFlag = 0;
 	
-	
+	private static  MediaPlayer mp = new MediaPlayer();
 	private static HashMap<String, String> masterList = new HashMap<String, String>();
     private static ArrayList<HashMap<String, String>> songsListEasy = new ArrayList<HashMap<String, String>>();
     private static ArrayList<HashMap<String, String>> songsListMed = new ArrayList<HashMap<String, String>>();
@@ -166,5 +169,13 @@ public class GlobalLists {
     public static int getFirst( ) {
     	return first;
     }
+    public static void setlistFlag( int f) {
+    	listFlag = f;
+    }
+    public static int getlistFlag( ) {
+    	return listFlag;
+    }
+    public static void setMP(MediaPlayer m) { mp = m;}
+    public static MediaPlayer getMP() { return mp;}
     
 }

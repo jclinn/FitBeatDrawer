@@ -147,7 +147,8 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	        
 	     // Mediaplayer
 	        mp = new MediaPlayer();
-	       // songManager = new SongsManager();
+	       //mp = GlobalLists.getMP();
+	        // songManager = new SongsManager();
 	        utils = new Utilities();
 	        
 	        //Listeners
@@ -392,7 +393,8 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	    public void playSong(int songIndex, int playlist) {
 	    	//Play song
 	    	try {
-	    		//checkModeIntensity(workout, mode);
+	    		//checkModeIntensity(workout, mode);' mPlayer.release();
+	    		//mp.release();
 	    		System.out.println("mode = " + mode + " size = " + songsListCur.size() + "index: " + songIndex + " song: ");// + songsListCur.get(songIndex));
 	    		mp.reset();
 	    		mp.setDataSource(songsListCur.get(songIndex).get("songPath"));
@@ -539,22 +541,33 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 					e.printStackTrace();
 				}
 			}
+			System.out.println(" size auto interval " + GlobalLists.getEasy1().size() + 
+					GlobalLists.getMed1().size() + GlobalLists.getHard1().size());
 			
-			GlobalLists.setEasyInterval(updateIntervalList(songsListEasy1, songsListMed1));
-			GlobalLists.setMedInterval(updateIntervalList(songsListEasy2, songsListMed2));
-			GlobalLists.setHardInterval(updateIntervalList(songsListMed2, songsListHard2));
-			GlobalLists.setEasyHill(updateHillClimbList(songsListEasy1, songsListEasy2, songsListMed1, songsListMed2));
-			GlobalLists.setMedHill(updateHillClimbList(songsListEasy2, songsListMed1, songsListMed2, songsListHard1));
-			GlobalLists.setHardHill(updateHillClimbList(songsListMed1, songsListMed2, songsListHard1, songsListHard2));
-			GlobalLists.setEasy(songsListEasy);
-			GlobalLists.setMed(songsListMed);
-			GlobalLists.setHard(songsListHard);
-			GlobalLists.setEasy1(songsListEasy1);
-			GlobalLists.setEasy2(songsListEasy2);
-			GlobalLists.setMed1(songsListMed1);
-			GlobalLists.setMed2(songsListMed2);
-			GlobalLists.setHard1(songsListHard);
-			GlobalLists.setHard2(songsListHard2);
+			if( GlobalLists.getlistFlag() == 0) {
+				GlobalLists.setEasy(songsListEasy);
+				GlobalLists.setMed(songsListMed);
+				GlobalLists.setHard(songsListHard);
+				GlobalLists.setEasy1(songsListEasy1);
+				GlobalLists.setEasy2(songsListEasy2);
+				GlobalLists.setMed1(songsListMed1);
+				GlobalLists.setMed2(songsListMed2);
+				GlobalLists.setHard1(songsListHard);
+				GlobalLists.setHard2(songsListHard2);	
+			
+			System.out.println(" size auto interval " + GlobalLists.getEasy1().size() + 
+					GlobalLists.getMed1().size() + GlobalLists.getHard1().size());
+			
+			}
+			GlobalLists.setlistFlag(1);
+			GlobalLists.setEasyInterval(updateIntervalList(GlobalLists.getEasy1(), GlobalLists.getMed1()));
+			GlobalLists.setMedInterval(updateIntervalList(GlobalLists.getEasy2(),  GlobalLists.getMed2()));
+			GlobalLists.setHardInterval(updateIntervalList( GlobalLists.getMed2(),  GlobalLists.getHard2()));
+			GlobalLists.setEasyHill(updateHillClimbList(GlobalLists.getEasy1(), GlobalLists.getEasy2(), GlobalLists.getMed1(), GlobalLists.getMed2()));
+			GlobalLists.setMedHill(updateHillClimbList(GlobalLists.getEasy2(),  GlobalLists.getMed1(),  GlobalLists.getMed2(), GlobalLists.getHard1()));
+			GlobalLists.setHardHill(updateHillClimbList( GlobalLists.getMed1(),  GlobalLists.getMed2(), GlobalLists.getHard1(), GlobalLists.getHard2()));
+			System.out.println(" size interval " + GlobalLists.getEasyInterval().size() + 
+					GlobalLists.getMedInterval().size() + GlobalLists.getHardInterval().size());
 			File home = new File(MEDIA_PATH);
 			if(home.listFiles(new FileExtensionFilter()) != null) {
 				System.out.println("found files");
@@ -577,11 +590,11 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 
 			@Override
 			protected Object doInBackground(Object... params) {
-				/*if(GlobalLists.getFirst()==1) {
+				if(GlobalLists.getFirst()==1) {
 					completedTask = true;
 					return null;
 				}
-				GlobalLists.setFirst(1);*/
+				GlobalLists.setFirst(1);
 				EchoNestAPI en = new EchoNestAPI("YONAIFTTA0HFKM9J4" );
 				File home = new File(MEDIA_PATH);
 				//File dbSongList = new File(DB);
@@ -758,6 +771,7 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 		
 		// returns mode and intensity combo from user selection
 		public int checkModeIntensity(int mode, int workout) {
+			System.out.println("updating songsListCur");
 			int comboMode;
 			//auto mode
 			if(workout == 1) {
@@ -794,8 +808,9 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 					comboMode = 9;
 				}
 				
-				GlobalLists.setCur(songsListCur);
+				
 			}
+			GlobalLists.setCur(songsListCur);
 			return comboMode;
 		}
 		
@@ -804,8 +819,8 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 			int slowCount = 0;
 			int fastCount = 0;
 			boolean empty = false;
-			System.out.println(" slow size: " + slow.size());
-			System.out.println("fast size: " + fast.size());
+			//System.out.println(" slow size: " + slow.size());
+			//System.out.println("fast size: " + fast.size());
 			while(empty==false) {
 				//System.out.println(" slowCount " + slowCount + " fastCount " + fastCount);
 				if(slowCount <= slow.size() -1) {
@@ -821,7 +836,7 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 					empty = true;
 				}
 			}
-			System.out.println("intervalList size " + intervalList.size());
+			//System.out.println("intervalList size " + intervalList.size());
 			return intervalList;
 		}
 		

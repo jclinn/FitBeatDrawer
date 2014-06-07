@@ -12,6 +12,8 @@ public class GlobalLists {
 	private static int first = 0;
 	private static int listFlag = 0;
 	private static int index = 0;
+	private static int playlist = 0;
+	private static int nowPlayingFlag = 0;
 	
 	private static  MediaPlayer mp = new MediaPlayer();
 	private static HashMap<String, String> masterList = new HashMap<String, String>();
@@ -180,4 +182,8 @@ public class GlobalLists {
     public static MediaPlayer getMP() { return mp;}
     public static void setIndex(int i) { index = i; }
     public static int getIndex(){ return index;} 
+    public static int getPlaylistFlag() { return playlist; }
+    public static void setPlaylistFlag(int p) { playlist = p; }
+    public static int getNowPlayingFlag() { return nowPlayingFlag; }
+    public static void setNowPlayingFlag(int n) { nowPlayingFlag = n;}
 }

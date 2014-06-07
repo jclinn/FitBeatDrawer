@@ -6,6 +6,7 @@ import java.util.HashMap;
 import com.menu.sliding.R;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -69,7 +70,12 @@ public class PlaylistFragment extends ListFragment{
 				int songIndex = position;
 				
 				GlobalLists.setIndex(songIndex);
-				
+				GlobalLists.setPlaylistFlag(1);
+				Fragment f = new HomeFragment();
+				FragmentTransaction transaction = getFragmentManager().beginTransaction();
+				transaction.replace(R.id.frame_container, f);
+				transaction.addToBackStack(null);
+				transaction.commit();
 			}
 		
 		});

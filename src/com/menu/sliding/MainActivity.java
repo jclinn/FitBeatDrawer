@@ -118,16 +118,19 @@ public class MainActivity extends Activity {
             displayView(position);
         }
     }
- 
+    
      /**
      * Diplaying fragment view for selected nav drawer list item
      * */
     private void displayView(int position) {
         // update the main content by replacing fragments
         Fragment fragment = null;
+        //int nowPlayingFlag = 0;
         switch (position) {
         case 0:
             fragment = new HomeFragment();
+            GlobalLists.setNowPlayingFlag(1);
+            //nowPlayingFlag = 1;
             break;
         case 1:
             fragment = new ModeFragment();
@@ -143,7 +146,7 @@ public class MainActivity extends Activity {
             break;
         }
  
-        if (fragment != null) {
+        if (fragment != null ) {
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.frame_container, fragment).commit();
@@ -153,7 +156,14 @@ public class MainActivity extends Activity {
             mDrawerList.setSelection(position);
             setTitle(navMenuTitles[position]);
             mDrawerLayout.closeDrawer(mDrawerList);
-        } else {
+       } /*else if (nowPlayingFlag == 1){
+        	nowPlayingFlag = 0;
+        	// update selected item and title, then close the drawer
+            mDrawerList.setItemChecked(position, true);
+            mDrawerList.setSelection(position);
+            setTitle(navMenuTitles[position]);
+            mDrawerLayout.closeDrawer(mDrawerList);
+        } */else {
             // error in creating fragment
             Log.e("MainActivity", "Error in creating fragment");
         }

@@ -155,10 +155,10 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	        songProgressBar.setOnSeekBarChangeListener(this);
 	        mp.setOnCompletionListener(this);
 	        
-	        new ParseInitialize().execute("");
+	        new ParseInitialize().execute();
 	       // Parse.initialize(getActivity(), "1HNsMPWDxmDo3SE6zwtsTqJMw8M63Ajw9yHUb88e", "vQ0lbV85eGTgp3d6PJ3rM82AuhsfpLqIsdKEstyy");
 	        try {
-	        	new Connection().execute("");
+	        	new Connection().execute();
 				songsList = getPlayList();
 				genListSize = songsList.size();
 				easyListSize = songsListEasy1.size();
@@ -179,7 +179,16 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 			comboMode = checkModeIntensity(GlobalLists.getMode(), GlobalLists.getWorkout());
 	       if(genListSize > 0) {
 		        //By default play first song
-		        playSong(0, 0);
+		        //playSong(0, 0);
+	    	    if( GlobalLists.getPlaylistFlag() == 1) {
+	    	    	playSong(GlobalLists.getIndex());
+	    	    	GlobalLists.setPlaylistFlag(0);
+	    	    } else if (GlobalLists.getNowPlayingFlag()==1) {
+	    	    	playSong(GlobalLists.getIndex());
+	    	    	GlobalLists.setNowPlayingFlag(0);
+	    	    } else {
+	    	    	playSong(0);
+	    	    }
 		        /**
 		         * Play button click event
 		         * plays a song and changes button to pause image
@@ -276,13 +285,13 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 		            public void onClick(View arg0) {
 		                // check if next song is there or not
 		                if(GlobalLists.getIndex() < (songsListCur.size() - 1)){
-		                    playSong(GlobalLists.getIndex() + 1, mode);
+		                    playSong(GlobalLists.getIndex() + 1);
 		                    
 		                   // currentSongIndex = currentSongIndex + 1;
 		                    GlobalLists.setIndex(GlobalLists.getIndex() +1);
 		                }else{
 		                    // play first song
-		                    playSong(0, mode);
+		                    playSong(0);
 		                    //currentSongIndex = 0;
 		                    GlobalLists.setIndex(0);
 		                }
@@ -299,11 +308,11 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 		            @Override
 		            public void onClick(View arg0) {
 		                if(GlobalLists.getIndex() > 0){
-		                    playSong(GlobalLists.getIndex() - 1, mode);
+		                    playSong(GlobalLists.getIndex() - 1);
 		                    GlobalLists.setIndex(GlobalLists.getIndex() -1);// = currentSongIndex - 1;
 		                }else{
 		                    // play last song
-		                    playSong(songsListCur.size() - 1, mode);
+		                    playSong(songsListCur.size() - 1);
 		                    //currentSongIndex = songsListCur.size() - 1;
 		                    GlobalLists.setIndex(songsListCur.size() - 1);
 		                }
@@ -368,10 +377,10 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	    }
 	    
 	    
-	    private class ParseInitialize extends AsyncTask {
+	    private class ParseInitialize extends AsyncTask<Void, Void, Void> {
 
 			@Override
-			protected Object doInBackground(Object... arg0) {
+			protected Void doInBackground(Void...voids) {
 				Parse.initialize(getActivity(), "1HNsMPWDxmDo3SE6zwtsTqJMw8M63Ajw9yHUb88e", "vQ0lbV85eGTgp3d6PJ3rM82AuhsfpLqIsdKEstyy");
 				return null;
 			}
@@ -387,14 +396,14 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	    	if(resultCode == 100) {
 	    		currentSongIndex = data.getExtras().getInt("songIndex");
 	    		//play selected song
-	    		playSong(currentSongIndex, mode);
+	    		playSong(currentSongIndex);
 	    	}
 	    }
 	    /*
 	     * Function to play a song
 	     * @param songIndex - index of song
 	     */
-	    public void playSong(int songIndex, int playlist) {
+	    public void playSong(int songIndex) {
 	    	//Play song
 	    	try {
 	    		//checkModeIntensity(workout, mode);' mPlayer.release();
@@ -513,22 +522,22 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	        // check for repeat is ON or OFF
 	        if(isRepeat){
 	            // repeat is on play same song again
-	            playSong(GlobalLists.getIndex(), mode);
+	            playSong(GlobalLists.getIndex());
 	        } else if(isShuffle){
 	            // shuffle is on - play a random song
 	            Random rand = new Random();
 	            //currentSongIndex = rand.nextInt((songsListCur.size() - 1) - 0 + 1) + 0;
 	            GlobalLists.setIndex(rand.nextInt((songsListCur.size() - 1) - 0 + 1) + 0);
-	            playSong(GlobalLists.getIndex(), mode);
+	            playSong(GlobalLists.getIndex());
 	        } else{
 	            // no repeat or shuffle ON - play next song
 	            if(GlobalLists.getIndex() < (songsListCur.size() - 1)){
-	                playSong(GlobalLists.getIndex() + 1, mode);
+	                playSong(GlobalLists.getIndex() + 1);
 	                //currentSongIndex = currentSongIndex + 1;
 	                GlobalLists.setIndex(GlobalLists.getIndex() + 1);
 	            }else{
 	                // play first song
-	                playSong(0, mode);
+	                playSong(0);
 	                //currentSongIndex = 0;
 	                GlobalLists.setIndex(0);
 	            }
@@ -595,10 +604,14 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 		}
 		
 		int count = 0;
-		private class Connection extends AsyncTask {
-
+		private class Connection extends AsyncTask<Void, Void, String> {
 			@Override
-			protected Object doInBackground(Object... params) {
+			protected void onPreExecute() {
+				super.onPreExecute();
+				//pd = ProgressDialog.show(getActivity(),"This is the title","This is the detail text",true,false,null);
+			}
+			@Override
+			protected String doInBackground(Void...voids) {
 				if(GlobalLists.getFirst()==1) {
 					completedTask = true;
 					return null;
@@ -761,7 +774,10 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 				completedTask = true;
 				return null;
 			}
-			
+			@Override
+			protected void onPostExecute(String result) {
+				super.onPostExecute(result);
+			}
 		}
 				
 		

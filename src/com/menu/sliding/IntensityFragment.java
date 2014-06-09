@@ -25,10 +25,10 @@ public class IntensityFragment extends Fragment {
         easy = (Button) rootView.findViewById(R.id.easy);
         if(GlobalLists.getMode() == 1) {
 			easy.setClickable(false);
-			easy.setBackgroundColor(Color.parseColor("#6F7371"));
+			easy.setAlpha((float) 0.5);
 		}else {
 			easy.setClickable(true);
-			easy.setBackgroundColor(Color.parseColor("#FFFFFF"));
+			easy.setAlpha((float) 1.0);
 		}
 		if(easy.isClickable()) {
 			easy.setOnClickListener(new View.OnClickListener(){
@@ -47,10 +47,10 @@ public class IntensityFragment extends Fragment {
 		med = (Button) rootView.findViewById(R.id.medium);
 		if(GlobalLists.getMode() == 2) {
 			med.setClickable(false);
-			med.setBackgroundColor(Color.parseColor("#6F7371"));
+			med.setAlpha((float) 0.5);
 		}else {
 			med.setClickable(true);
-			med.setBackgroundColor(Color.parseColor("#FFFFFF"));
+			med.setAlpha((float) 1.0);
 		}
 		if(med.isClickable()) {
 			med.setOnClickListener(new View.OnClickListener(){
@@ -69,10 +69,10 @@ public class IntensityFragment extends Fragment {
 		hard = (Button) rootView.findViewById(R.id.hard);
 		if(GlobalLists.getMode() == 3) {
 			hard.setClickable(false);
-			hard.setBackgroundColor(Color.parseColor("#6F7371"));
+			hard.setAlpha((float) 0.5);
 		}else {
 			hard.setClickable(true);
-			hard.setBackgroundColor(Color.parseColor("#FFFFFF"));
+			hard.setAlpha((float) 1.0);
 		}
 		if(hard.isClickable()) {
 			hard.setOnClickListener(new View.OnClickListener(){

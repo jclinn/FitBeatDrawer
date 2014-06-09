@@ -2,40 +2,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+       android:background= "@drawable/phonebg" >
 
-    <TextView
-        android:id="@+id/selectmode"
+    
+     <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:gravity="center">
+     
+             <ImageButton
+                android:layout_width="207dp"
+                android:layout_height="65dp"
+                android:background="@null"
+                android:scaleType="centerInside"
+                android:src="@drawable/title2" />
+             
+             
+
+ 	   </LinearLayout>
+ 	                  <ImageButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_weight="1"
-        android:text="Select Workout Mode"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
+                android:background="@null"
+                android:scaleType="centerInside"
+                android:src="@drawable/mode_title" />
+     
     <Button
         android:id="@+id/auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="40dp"
         android:layout_weight ="1"
-        android:text="Automatic" />
+        android:background="@drawable/mode_automatic"/>
     
     <Button
        android:id="@+id/interval"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:textSize="40dp"
        android:layout_weight ="1"
-       android:text="Interval" />
+       android:background="@drawable/mode_interval" />
        
      <Button
        android:id="@+id/hillclimb"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:textSize="40dp"
        android:layout_weight ="1"
-       android:text="Hill Climb" />
+       android:background="@drawable/mode_hill"/>
 
 </LinearLayout>
  

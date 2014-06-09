@@ -30,10 +30,10 @@ public class ModeFragment extends Fragment {
         //if already selected, disable button
 		if(GlobalLists.getWorkout() == 1) {
 			auto.setClickable(false);
-			auto.setBackgroundColor(Color.parseColor("#6F7371"));
+			auto.setAlpha((float) 0.5);
 		}else {
 			auto.setClickable(true);
-			auto.setBackgroundColor(Color.parseColor("#FFFFFF"));
+			auto.setAlpha((float) 1.0);
 		}
 		if(auto.isClickable()) {
 			auto.setOnClickListener(new View.OnClickListener(){
@@ -56,10 +56,11 @@ public class ModeFragment extends Fragment {
 		interval = (Button) rootView.findViewById(R.id.interval);
 		if(GlobalLists.getWorkout() == 2) {
 			interval.setClickable(false);
-			interval.setBackgroundColor(Color.parseColor("#6F7371"));
+			interval.setAlpha((float) 0.5);
+			
 		}else {
 			interval.setClickable(true);
-			interval.setBackgroundColor(Color.parseColor("#FFFFFF"));
+			interval.setAlpha((float) 1.0);
 		}
 		if(interval.isClickable()) {
 			interval.setOnClickListener(new View.OnClickListener(){
@@ -83,10 +84,10 @@ public class ModeFragment extends Fragment {
 		
 		if(GlobalLists.getWorkout() == 3) {
 			hill.setClickable(false);
-			hill.setBackgroundColor(Color.parseColor("#6F7371"));
+			hill.setAlpha((float) 0.5);
 		}else {
 			hill.setClickable(true);
-			hill.setBackgroundColor(Color.parseColor("#FFFFFF"));
+			hill.setAlpha((float) 1.0);
 		}
 		if(hill.isClickable()) {
 			hill.setOnClickListener(new View.OnClickListener(){

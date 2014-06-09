@@ -6,18 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import com.echonest.api.v4.EchoNestAPI;
 import com.echonest.api.v4.EchoNestException;
@@ -26,7 +20,6 @@ import com.menu.sliding.Utilities;
 
 import java.io.FilenameFilter;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -34,27 +27,23 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.parse.FindCallback;
+
 import com.parse.Parse;
-import com.parse.ParseAnalytics;
+
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 public class HomeFragment extends Fragment 
-implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventListener {
+implements OnCompletionListener, SeekBar.OnSeekBarChangeListener {
 	private ImageButton btnPlay;
     private ImageButton btnForward;
     private ImageButton btnBackward;
@@ -67,6 +56,8 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
     private TextView songTitleLabel;
     private TextView songCurrentDurationLabel;
     private TextView songTotalDurationLabel;
+    private TextView modeTV;
+    private TextView intensityTV;
     // Media Player
     private  MediaPlayer mp;
     // Handler to update UI timer, progress bar etc,.
@@ -103,18 +94,12 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
     protected String hard2 = "hard2";    
     private int mode = 0;
     private int workout = 1;
-    private int comboMode = 0;
-    private boolean hill = false;
-    
-    
     
     //songmanager variables
     final String MEDIA_PATH = Environment.getExternalStorageDirectory()
             .getPath() + "/";
 	final String DB = Environment.getExternalStorageDirectory()
             .getPath() + "/songlist.txt";
-	//private ArrayList<HashMap<String,String>> songsList = new ArrayList<HashMap<String, String>>();
-	private ArrayList<HashMap<String,String>> songsListTempo = new ArrayList<HashMap<String, String>>();
 	private boolean completedTask = false;
  
     //sensor variables
@@ -137,18 +122,19 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	        btnBackward = (ImageButton) rootView.findViewById(R.id.btnBackward);
 	        btnNext = (ImageButton) rootView.findViewById(R.id.btnNext);
 	        btnPrevious = (ImageButton) rootView.findViewById(R.id.btnPrevious);
-	       // btnPlaylist = (ImageButton) rootView.findViewById(R.id.btnPlaylist);
 	        btnRepeat = (ImageButton) rootView.findViewById(R.id.btnRepeat);
 	        btnShuffle = (ImageButton) rootView.findViewById(R.id.btnShuffle);
 	        songProgressBar = (SeekBar) rootView.findViewById(R.id.songProgressBar);
 	        songTitleLabel = (TextView) rootView.findViewById(R.id.songTitle);
 	        songCurrentDurationLabel = (TextView) rootView.findViewById(R.id.songCurrentDurationLabel);
 	        songTotalDurationLabel = (TextView) rootView.findViewById(R.id.songTotalDurationLabel);
+	        modeTV = (TextView) rootView.findViewById(R.id.mode1);
+	        intensityTV = (TextView) rootView.findViewById(R.id.intensity1);
 	        
-	     // Mediaplayer
-	        //mp = new MediaPlayer();
-	       mp = GlobalLists.getMP();
-	        // songManager = new SongsManager();
+	        System.out.println("workout: " + GlobalLists.getWorkout() + " intensity " + GlobalLists.getMode());
+
+	       // Mediaplayer
+	        mp = GlobalLists.getMP();
 	        utils = new Utilities();
 	        
 	        //Listeners
@@ -156,38 +142,29 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	        mp.setOnCompletionListener(this);
 	        
 	        new ParseInitialize().execute();
-	       // Parse.initialize(getActivity(), "1HNsMPWDxmDo3SE6zwtsTqJMw8M63Ajw9yHUb88e", "vQ0lbV85eGTgp3d6PJ3rM82AuhsfpLqIsdKEstyy");
+	      
 	        try {
 	        	new Connection().execute();
-				songsList = getPlayList();
+				songsList = getPlayList(); //songsList needed just in case user doesnt have any music
 				genListSize = songsList.size();
-				easyListSize = songsListEasy1.size();
-				medListSize = songsListMed1.size();
-				hardListSize = songsListHard1.size();
-				System.out.println("masterlistsize: " + masterList.size() + " easy: " + songsListEasy1.size() +
-						" med: " + songsListMed1.size() + " hard: " + songsListHard1.size());
 			} catch (EchoNestException e) {
 				e.printStackTrace();
 			}
 	        
-	        /*getFragmentManager().beginTransaction()
-            // Add this transaction to the back stack
-            .addToBackStack("found")
-            .commit();*/
-	        
 	      //update playlists
-			comboMode = checkModeIntensity(GlobalLists.getMode(), GlobalLists.getWorkout());
+	        checkModeIntensity(GlobalLists.getMode(), GlobalLists.getWorkout());
+	        modeTV.setText(GlobalLists.getWorkoutString());
+	        intensityTV.setText(GlobalLists.getModeString());
 	       if(genListSize > 0) {
 		        //By default play first song
-		        //playSong(0, 0);
-	    	    if( GlobalLists.getPlaylistFlag() == 1) {
+	    	    if( GlobalLists.getPlaylistFlag() == 1) { // case when selecting from playlist
 	    	    	playSong(GlobalLists.getIndex());
 	    	    	GlobalLists.setPlaylistFlag(0);
-	    	    } else if (GlobalLists.getNowPlayingFlag()==1) {
+	    	    } else if (GlobalLists.getNowPlayingFlag()==1) { // case when now playing clicked twice then play current song
 	    	    	playSong(GlobalLists.getIndex());
 	    	    	GlobalLists.setNowPlayingFlag(0);
 	    	    } else {
-	    	    	playSong(0);
+	    	    	playSong(0); // else play from beginning of list
 	    	    }
 		        /**
 		         * Play button click event
@@ -217,20 +194,6 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 		            }
 		        });
 		        
-		        /*
-		         *  Button Click event for Playlist click event
-		         *  Launches list activity which displays list of songs
-		         */
-		      /*  btnPlaylist.setOnClickListener(new View.OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						Intent i = new Intent(getActivity().getApplicationContext(), PlaylistFragment.class);
-						i.putExtra("playlist", songsListCur);
-						startActivityForResult(i, 100);
-						
-					}
-				});*/
 		        
 		        /**
 		         * Forward button click event
@@ -376,7 +339,7 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	        return rootView;
 	    }
 	    
-	    
+	    //initialize Parse
 	    private class ParseInitialize extends AsyncTask<Void, Void, Void> {
 
 			@Override
@@ -387,18 +350,6 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	    	
 	    }
 	    
-	    /* 
-	     * Recieving song index from playlist view and play the song
-	     */
-	    @Override
-	    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-	    	super.onActivityResult(requestCode, resultCode, data);
-	    	if(resultCode == 100) {
-	    		currentSongIndex = data.getExtras().getInt("songIndex");
-	    		//play selected song
-	    		playSong(currentSongIndex);
-	    	}
-	    }
 	    /*
 	     * Function to play a song
 	     * @param songIndex - index of song
@@ -406,9 +357,6 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	    public void playSong(int songIndex) {
 	    	//Play song
 	    	try {
-	    		//checkModeIntensity(workout, mode);' mPlayer.release();
-	    		//mp.release();
-	    		System.out.println("mode = " + mode + " size = " + songsListCur.size() + "index: " + songIndex + " song: ");// + songsListCur.get(songIndex));
 	    		mp.reset();
 	    		mp.setDataSource(songsListCur.get(songIndex).get("songPath"));
 	    		mp.prepare();
@@ -434,19 +382,6 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	            e.printStackTrace();
 	        }
 	    }
-	    
-		@Override
-		public void onAccuracyChanged(Sensor arg0, int arg1) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onSensorChanged(SensorEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
 
 		/**
 	     * Update timer on seekbar
@@ -526,19 +461,16 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 	        } else if(isShuffle){
 	            // shuffle is on - play a random song
 	            Random rand = new Random();
-	            //currentSongIndex = rand.nextInt((songsListCur.size() - 1) - 0 + 1) + 0;
 	            GlobalLists.setIndex(rand.nextInt((songsListCur.size() - 1) - 0 + 1) + 0);
 	            playSong(GlobalLists.getIndex());
 	        } else{
 	            // no repeat or shuffle ON - play next song
 	            if(GlobalLists.getIndex() < (songsListCur.size() - 1)){
 	                playSong(GlobalLists.getIndex() + 1);
-	                //currentSongIndex = currentSongIndex + 1;
 	                GlobalLists.setIndex(GlobalLists.getIndex() + 1);
 	            }else{
 	                // play first song
 	                playSong(0);
-	                //currentSongIndex = 0;
 	                GlobalLists.setIndex(0);
 	            }
 	        }
@@ -549,17 +481,15 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 		 * and store the details in ArrayList
 		 */
 		public ArrayList<HashMap<String, String>> getPlayList() throws EchoNestException {
+			//waits for Asycfunc to update playlists
 			while(!completedTask) {
-				System.out.println("waiting on thread");
 				try {
 					Thread.sleep(4000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			System.out.println(" size auto interval " + GlobalLists.getEasy1().size() + " easy: " + GlobalLists.getEasy().size() + " " + 
-					GlobalLists.getMed1().size() +  " med: " + GlobalLists.getMed().size() +  " hard: " + GlobalLists.getHard().size() + " " + GlobalLists.getHard1().size());
-			
+			// if first time running application, then set basic playlist (don't want to overwrite when generating another player
 			if( GlobalLists.getlistFlag() == 0) {
 				GlobalLists.setEasy(songsListEasy);
 				GlobalLists.setMed(songsListMed);
@@ -570,13 +500,10 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 				GlobalLists.setMed2(songsListMed2);
 				GlobalLists.setHard1(songsListHard);
 				GlobalLists.setHard2(songsListHard2);	
-			
-			System.out.println(" size auto interval " + GlobalLists.getEasy1().size() + 
-					GlobalLists.getMed1().size() + GlobalLists.getHard1().size());
+
 			
 			}
-			System.out.println(" sizes interval " + GlobalLists.getEasy1().size() + " easy: " + GlobalLists.getEasy().size() + " " + 
-					GlobalLists.getMed1().size() +  " med: " + GlobalLists.getMed().size() +  " hard: " + GlobalLists.getHard().size() + " " + GlobalLists.getHard1().size());
+			
 			GlobalLists.setlistFlag(1);
 			GlobalLists.setEasyInterval(updateIntervalList(GlobalLists.getEasy1(), GlobalLists.getMed1()));
 			GlobalLists.setMedInterval(updateIntervalList(GlobalLists.getEasy2(),  GlobalLists.getMed2()));
@@ -584,11 +511,10 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 			GlobalLists.setEasyHill(updateHillClimbList(GlobalLists.getEasy1(), GlobalLists.getEasy2(), GlobalLists.getMed1(), GlobalLists.getMed2()));
 			GlobalLists.setMedHill(updateHillClimbList(GlobalLists.getEasy2(),  GlobalLists.getMed1(),  GlobalLists.getMed2(), GlobalLists.getHard1()));
 			GlobalLists.setHardHill(updateHillClimbList( GlobalLists.getMed1(),  GlobalLists.getMed2(), GlobalLists.getHard1(), GlobalLists.getHard2()));
-			System.out.println(" size interval " + GlobalLists.getEasyInterval().size() + 
-					GlobalLists.getMedInterval().size() + GlobalLists.getHardInterval().size());
+			
 			File home = new File(MEDIA_PATH);
 			if(home.listFiles(new FileExtensionFilter()) != null) {
-				System.out.println("found files");
+				
 				if (home.listFiles(new FileExtensionFilter()).length > 0) {
 					for( File file: home.listFiles(new FileExtensionFilter())) {
 						HashMap<String, String> song = new HashMap<String, String>();
@@ -599,11 +525,11 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 					}
 				}
 			}
-			System.out.println("size of songslist after SongsManager: " + songsList.size());
+			
 			return songsList;
 		}
 		
-		int count = 0;
+		
 		private class Connection extends AsyncTask<Void, Void, String> {
 			@Override
 			protected void onPreExecute() {
@@ -612,166 +538,150 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 			}
 			@Override
 			protected String doInBackground(Void...voids) {
-				if(GlobalLists.getFirst()==1) {
+				if(GlobalLists.getFirst()==1) { //if first time running application, then call Parse/EchoNestAPI to get song data
 					completedTask = true;
 					return null;
 				}
 				GlobalLists.setFirst(1);
 				EchoNestAPI en = new EchoNestAPI("YONAIFTTA0HFKM9J4" );
 				File home = new File(MEDIA_PATH);
-				//File dbSongList = new File(DB);
 
-					if(home.listFiles(new FileExtensionFilter()) != null) {
-						
-						if (home.listFiles(new FileExtensionFilter()).length > 0) {
-							for( File file: home.listFiles(new FileExtensionFilter())) {
-								try {
-									
-									 File currFile = new File(file.getPath());
-									 if(!currFile.exists()) {
-										 System.err.println("Can't find in async " + file.getPath());
-									 }
-									 else {
-										 uploaded = false;
-										String title = file.getName().substring(0, (file.getName().length()-4));
-										String path = file.getPath();
-										// System.out.println("file name" + file.getName().substring(0, (file.getName().length()-4)) + " counter" + count);
-										 ParseQuery<ParseObject> query = ParseQuery.getQuery("SongObject");
-										 query.whereEqualTo("title", title );
-									       	try {
-									            List<ParseObject> queryResult = query.find();
-									            for(ParseObject so : queryResult) {
-									                ParseObject songObj = new ParseObject("SongObject");
-									                System.out.println("inside parse " + so.getString("title"));
-									                uploaded = true;
-									                
-													masterList.put(title, path);
-													 
-													// adds mode
-													String mode = so.getString("mode");
-													HashMap<String, String>song = new HashMap<String, String>();
-													song.put("songTitle", title); //-4 because .mp3
-													song.put("songPath", file.getPath());
-													//System.out.println("mode: " + mode);
-													 
-													if(mode.equals(easy1)) {
-														song.put("mode", easy1);
-														songsListEasy1.add(song);
-														songsListEasy.add(song);
-													} else if(mode.equals(easy2)) {
-														song.put("mode", easy2);
-														songsListEasy2.add(song);
-														songsListEasy.add(song);
-													} else if(mode.equals(med1)) {
-														song.put("mode", med1);
-														songsListMed1.add(song);
-														songsListMed.add(song);
-														System.out.println("med song added");
-													} else if(mode.equals(med2)) {
-														song.put("mode", med2);
-														songsListMed2.add(song);
-														songsListMed.add(song);
-														System.out.println("med song added");
-													} else if(mode.equals(hard1)) {
-													    song.put("mode", hard1);
-													    songsListHard1.add(song);
-													    songsListHard.add(song);
-													} else {
-														song.put("mode", hard2);
-													    songsListHard2.add(song);
-													    songsListHard.add(song);
-													}
-													
-													
-													
-									            }
-									        }
-									        catch(ParseException e) {
-									            Log.d("mNameList", "Error: " + e.getMessage());
-									        }
-
-										 
-										 if(!uploaded) {
-											// uploaded = false;
-										    System.out.println("EchoNest API call");
-							                Track track = en.uploadTrack(currFile, true);
-							                track.waitForAnalysis(30000);
-							                //System.out.println("waiting for analysis " + file.getPath() + " counter " + count + "what?");
-							                count++;
-							                if (track.getStatus() == Track.AnalysisStatus.COMPLETE) {
-							                    System.out.println("Tempo: " + track.getTempo());
-												HashMap<String, String> song = new HashMap<String, String>();
-												song.put("songPath",  file.getPath());
-												
-												int tempo = (int) track.getTempo();
-												String mode = "";
-												if(tempo >= 130 && tempo < 145 ) { //hard 1
-													song.put("mode", hard1);
-													songsListHard1.add(song);
-													songsListHard.add(song);
-													mode = "hard1";
-												}
-												else if( tempo > 145) { // hard 2
-													song.put("mode", hard2);
-													songsListHard2.add(song);
-													songsListHard.add(song);
-													mode = "hard2";
-												}
-												else if(tempo >= 115 && tempo < 130) { // med 2
-													song.put("mode", med2);
-													songsListMed2.add(song);
-													songsListMed.add(song);
-													mode = "med2";
-												}
-												else if( tempo >= 90 && tempo < 115) { // med 1
-													song.put("mode", med1);
-													songsListMed1.add(song);
-													songsListMed.add(song);
-													mode = "med1";
-												}
-												else if( tempo >= 85 && tempo < 90) { //easy 2
+				if(home.listFiles(new FileExtensionFilter()) != null) {
+					
+					if (home.listFiles(new FileExtensionFilter()).length > 0) {
+						for( File file: home.listFiles(new FileExtensionFilter())) {
+							try {
+								
+								 File currFile = new File(file.getPath());
+								 if(!currFile.exists()) {
+									 System.err.println("Can't find in async " + file.getPath());
+								 }
+								 else { // if song is not found in Parse then call EchoNestAPI for tempo
+									 uploaded = false;
+									 String title = file.getName().substring(0, (file.getName().length()-4));
+									 String path = file.getPath();
+									 ParseQuery<ParseObject> query = ParseQuery.getQuery("SongObject");
+									 query.whereEqualTo("title", title );
+								       	try {
+								            List<ParseObject> queryResult = query.find(); // query to find songObjects in db
+								            for(ParseObject so : queryResult) {
+								                uploaded = true;
+												masterList.put(title, path);
+												 
+												// adds mode
+												String mode = so.getString("mode");
+												HashMap<String, String>song = new HashMap<String, String>();
+												song.put("songTitle", title); //-4 because .mp3
+												song.put("songPath", file.getPath());
+											
+												// updates playlists
+												if(mode.equals(easy1)) {
+													song.put("mode", easy1);
+													songsListEasy1.add(song);
+													songsListEasy.add(song);
+												} else if(mode.equals(easy2)) {
 													song.put("mode", easy2);
 													songsListEasy2.add(song);
 													songsListEasy.add(song);
-													mode = "easy2";
+												} else if(mode.equals(med1)) {
+													song.put("mode", med1);
+													songsListMed1.add(song);
+													songsListMed.add(song);
+												} else if(mode.equals(med2)) {
+													song.put("mode", med2);
+													songsListMed2.add(song);
+													songsListMed.add(song);
+												} else if(mode.equals(hard1)) {
+												    song.put("mode", hard1);
+												    songsListHard1.add(song);
+												    songsListHard.add(song);
+												} else {
+													song.put("mode", hard2);
+												    songsListHard2.add(song);
+												    songsListHard.add(song);
 												}
-												else { // easy 
-													song.put("mode", easy1);
-												    songsListEasy1.add(song);
-												    songsListEasy.add(song);
-													mode ="easy1";
-												}
-												
+								            }
+								        }
+								        catch(ParseException e) {
+								            Log.d("mNameList", "Error: " + e.getMessage());
+								        }
+
+									 
+									 if(!uploaded) {
+						                Track track = en.uploadTrack(currFile, true);
+						                track.waitForAnalysis(30000);
+
+						                if (track.getStatus() == Track.AnalysisStatus.COMPLETE) {
+											HashMap<String, String> song = new HashMap<String, String>();
+											song.put("songPath",  file.getPath());
 											
-												
-										        ParseObject songObject = new ParseObject("SongObject");
-										        songObject.put("path", file.getPath());
-										        songObject.put("title", title);
-										        songObject.put("mode", mode);
-										        songObject.put("tempo", tempo);
-										        songObject.saveInBackground();
-										        
-										        masterList.put(title, path);
-							                } else {
-							                    System.err.println("Trouble analysing track " + track.getStatus());
-							                }
-										 }
-									  }
-									 
-									 
-					            } catch (IOException e) {
-					                System.err.println("Trouble uploading file");
-					            } catch (EchoNestException e) {
-									e.printStackTrace();
-								}
+											int tempo = (int) track.getTempo();
+											String mode = "";
+											
+											//setting music ranges 
+											if(tempo >= 130 && tempo < 145 ) { //hard 1
+												song.put("mode", hard1);
+												songsListHard1.add(song);
+												songsListHard.add(song);
+												mode = "hard1";
+											}
+											else if( tempo > 145) { // hard 2
+												song.put("mode", hard2);
+												songsListHard2.add(song);
+												songsListHard.add(song);
+												mode = "hard2";
+											}
+											else if(tempo >= 115 && tempo < 130) { // med 2
+												song.put("mode", med2);
+												songsListMed2.add(song);
+												songsListMed.add(song);
+												mode = "med2";
+											}
+											else if( tempo >= 90 && tempo < 115) { // med 1
+												song.put("mode", med1);
+												songsListMed1.add(song);
+												songsListMed.add(song);
+												mode = "med1";
+											}
+											else if( tempo >= 85 && tempo < 90) { //easy 2
+												song.put("mode", easy2);
+												songsListEasy2.add(song);
+												songsListEasy.add(song);
+												mode = "easy2";
+											}
+											else { // easy 
+												song.put("mode", easy1);
+											    songsListEasy1.add(song);
+											    songsListEasy.add(song);
+												mode ="easy1";
+											}
+											
+											//adding new music to Parse DB
+									        ParseObject songObject = new ParseObject("SongObject");
+									        songObject.put("path", file.getPath());
+									        songObject.put("title", title);
+									        songObject.put("mode", mode);
+									        songObject.put("tempo", tempo);
+									        songObject.saveInBackground();
+									        
+									        masterList.put(title, path);
+						                } else {
+						                    System.err.println("Trouble analysing track " + track.getStatus());
+						                }
+									 }
+								  }
+								 
+								 
+				            } catch (IOException e) {
+				                System.err.println("Trouble uploading file");
+				            } catch (EchoNestException e) {
+								e.printStackTrace();
 							}
 						}
 					}
-					
+				}
 
-			//	System.out.println("home found: " + home + " files: " + Environment.getExternalStorageDirectory().listFiles());
-
-				completedTask = true;
+				completedTask = true; //asyc task finished
 				return null;
 			}
 			@Override
@@ -794,80 +704,61 @@ implements OnCompletionListener, SeekBar.OnSeekBarChangeListener, SensorEventLis
 			
 		}
 		
-		
-		
+
 		// returns mode and intensity combo from user selection
-		public int checkModeIntensity(int mode, int workout) {
-			System.out.println("updating songsListCur");
-			int comboMode;
+		public void checkModeIntensity(int mode, int workout) {
 			//auto mode
 			if(workout == 1) {
 				if( mode == 1 ) { //easy
-					comboMode = 1;
 					songsListCur = GlobalLists.getEasy();//songsListEasy;
 				} else if (mode == 2) { //medium
-					comboMode = 2;
 					songsListCur = GlobalLists.getMed();//songsListMed;
 				} else { //hard
-					comboMode = 3;
 					songsListCur = GlobalLists.getHard();//songsListHard;
-				}
-			} else if (workout == 2) { //interval
+				} //interval
 				if( mode == 1 ) { //easy
 					songsListCur = GlobalLists.getEasyInterval();
-					comboMode = 4;
 				} else if (mode == 2) { //medium
 					songsListCur = GlobalLists.getMedInterval();
-					comboMode = 5;
 				} else { //hard
 					songsListCur = GlobalLists.getHardInterval();
-					comboMode = 6;
 				}
 			} else  { // hillclimb
 				if( mode == 1 ) { //easy
 					songsListCur = GlobalLists.getEasyHill();
-					comboMode = 7;
 				} else if (mode == 2) { //medium
 					songsListCur = GlobalLists.getMedHill();
-					comboMode = 8;
 				} else { //hard
 					songsListCur = GlobalLists.getHardHill();
-					comboMode = 9;
 				}
 				
 				
 			}
 			GlobalLists.setCur(songsListCur);
-			return comboMode;
 		}
 		
+		// generating interval lists
 		public ArrayList<HashMap<String, String>> updateIntervalList ( ArrayList<HashMap<String, String>> slow, ArrayList<HashMap<String, String>> fast) {
 			ArrayList<HashMap<String, String>> intervalList = new ArrayList<HashMap<String, String>>();
 			int slowCount = 0;
 			int fastCount = 0;
 			boolean empty = false;
-			//System.out.println(" slow size: " + slow.size());
-			//System.out.println("fast size: " + fast.size());
 			while(empty==false) {
-				//System.out.println(" slowCount " + slowCount + " fastCount " + fastCount);
 				if(slowCount <= slow.size() -1) {
-					//System.out.println("in slow");
 					intervalList.add(slow.get(slowCount));
 					slowCount++;
 				}
 				else if(fastCount<= fast.size()-1){
-					//System.out.println("in fast");
 					intervalList.add(fast.get(fastCount));
 					fastCount++;
 				} else {
 					empty = true;
 				}
 			}
-			//System.out.println("intervalList size " + intervalList.size());
 			return intervalList;
 		}
 		
-		
+		//generating hill climb list
 		public ArrayList<HashMap<String, String>> updateHillClimbList ( ArrayList<HashMap<String, String>> slow, 
 				ArrayList<HashMap<String, String>> med, ArrayList<HashMap<String, String>> avg, ArrayList<HashMap<String, String>> fast) {
 			ArrayList<HashMap<String, String>> intervalList = new ArrayList<HashMap<String, String>>();

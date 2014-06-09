@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.media.MediaPlayer;
-
+/* global variables used to communicate between fragments and MainActivity */
 public class GlobalLists {
-	private static int mode = 0;
+	private static int mode = 1;
 	private static int workout =1;
+	private static String workoutString = "Auto";
+	private static String modeString = "Easy";
 	private static int comboMode = 0;
 	private static int first = 0;
 	private static int listFlag = 0;
@@ -16,7 +18,6 @@ public class GlobalLists {
 	private static int nowPlayingFlag = 0;
 	
 	private static  MediaPlayer mp = new MediaPlayer();
-	private static HashMap<String, String> masterList = new HashMap<String, String>();
     private static ArrayList<HashMap<String, String>> songsListEasy = new ArrayList<HashMap<String, String>>();
     private static ArrayList<HashMap<String, String>> songsListMed = new ArrayList<HashMap<String, String>>();
     private static ArrayList<HashMap<String, String>> songsListHard = new ArrayList<HashMap<String, String>>();
@@ -186,4 +187,9 @@ public class GlobalLists {
     public static void setPlaylistFlag(int p) { playlist = p; }
     public static int getNowPlayingFlag() { return nowPlayingFlag; }
     public static void setNowPlayingFlag(int n) { nowPlayingFlag = n;}
+    public static String getWorkoutString() { return workoutString; }
+    public static String getModeString() {return modeString; }
+    public static void setWorkoutString(String s) {workoutString = s; }
+    public static void setModeString(String s) {modeString = s;}
+    
 }

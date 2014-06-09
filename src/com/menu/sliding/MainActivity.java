@@ -125,12 +125,10 @@ public class MainActivity extends Activity {
     private void displayView(int position) {
         // update the main content by replacing fragments
         Fragment fragment = null;
-        //int nowPlayingFlag = 0;
         switch (position) {
         case 0:
             fragment = new HomeFragment();
             GlobalLists.setNowPlayingFlag(1);
-            //nowPlayingFlag = 1;
             break;
         case 1:
             fragment = new ModeFragment();
@@ -156,14 +154,7 @@ public class MainActivity extends Activity {
             mDrawerList.setSelection(position);
             setTitle(navMenuTitles[position]);
             mDrawerLayout.closeDrawer(mDrawerList);
-       } /*else if (nowPlayingFlag == 1){
-        	nowPlayingFlag = 0;
-        	// update selected item and title, then close the drawer
-            mDrawerList.setItemChecked(position, true);
-            mDrawerList.setSelection(position);
-            setTitle(navMenuTitles[position]);
-            mDrawerLayout.closeDrawer(mDrawerList);
-        } */else {
+       } else {
             // error in creating fragment
             Log.e("MainActivity", "Error in creating fragment");
         }
